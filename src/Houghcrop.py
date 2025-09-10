@@ -1,4 +1,3 @@
-#i think these are already done- delete once pipeline is finalized
 import numpy as np
 import cv2 as cv
 import os
@@ -6,7 +5,7 @@ import os
 #color or grayscale version (depends on what was passed in!)
 def hough_crop_eye(filename, input_folder='data/raw_images', 
                    dp=1.2, minDist=100, param1=100, param2=60, 
-                   minRadius=30, maxRadius=150, output_size=(224, 224)):
+                   minRadius=80, maxRadius=250, output_size=(600, 600)):
     """
     Uses Hough Circle Transform to detect circular features (e.g., cornea or pupil) and crops the image around the detected circle.
 
@@ -61,18 +60,9 @@ def hough_crop_eye(filename, input_folder='data/raw_images',
         final_img = cv.resize(cropped, output_size)
     else:
         raise ValueError(f"Hough Transform failed to detect a circle in: {filename}")
+    
+    # Ensure the image is returned to 3 channels (BGR) for AI integration
+    if len(final_img.shape) == 2:  # grayscale
+        final_img = cv.cvtColor(final_img, cv.COLOR_GRAY2BGR)
 
     return final_img, filename
-
-#FOR THE TEST ONLY: DELETE ONCE PIPELINE IS ESTABLISHED
-if __name__ == "__main__":
-    test_filename = "T0018_2019-06-10_BL (6).JPG"
-    input_folder = "data/raw_images"
-
-    img, filename = hough_crop_eye(test_filename, input_folder=input_folder)
-
-    # Display the image
-    import cv2
-    cv2.imshow("Hough Transformation Result", img)
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
